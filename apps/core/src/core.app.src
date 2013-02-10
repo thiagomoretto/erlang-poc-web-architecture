@@ -1,0 +1,16 @@
+{application, core,
+ [
+  {description, "Code functionality"},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib,
+                  inets,
+                  crypto,
+                  mochiweb,
+                  webmachine
+                 ]},
+  {mod, { core_app, []}},
+  {env, []}
+ ]}.

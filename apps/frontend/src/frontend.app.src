@@ -1,0 +1,18 @@
+%%-*- mode: erlang -*-
+{application, frontend,
+ [
+  {description, "frontend"},
+  {vsn, "1"},
+  {modules, []},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib,
+                  inets,
+                  crypto,
+                  mochiweb,
+                  webmachine
+                 ]},
+  {mod, { frontend_app, []}},
+  {env, []}
+ ]}.

@@ -1,5 +1,5 @@
 -module(core_data).
--export([fetch_as_proplist/3, fetch_as_json/3, save/4]).
+-export([fetch_as_proplist/3, fetch_as_json/3, save/3, update/4, delete/3]).
 
 %% 
 %% API Exported
@@ -18,19 +18,31 @@ fetch_as_json(RiakPid, ResourceName, Key) ->
       {error, notfound}
   end.
 
-save(RiakPid, ResourceName, Key, Resource={resource, ResourceData}) ->
-  case proplists:get_value(key, ResourceData, undefined) of
-    undefined ->
-      NewResourceData = [{key, Key} | ResourceData],
-      RiakObj = core_riak:create(ResourceName, Key, to_json_internal(NewResourceData)),
-      ok = core_riak:save(RiakPid, RiakObj),
-      {resource, NewResourceData};
-    ExistingKey ->
-      RiakObj = core_riak:fetch(RiakPid, ResourceName, ExistingKey),
-      NewRiakObj = core_riak:update(RiakObj, to_json_internal(ResourceData)),
-      ok = core_riak:save(RiakPid, NewRiakObj),
-      {resource, Resource}
-  end.
+save(RiakPid, ResourceName, Resource={resource, ResourceData}) ->
+  NewKey = core_riak:new_key(),
+  NewResourceData = [{key, NewKey} | ResourceData],
+  
+  io:format("[debug] new resource data: ~p json: ~p~n", 
+      [ NewResourceData, to_json_internal(NewResourceData) ]),
+
+  RiakObj = core_riak:create(ResourceName, NewKey, to_json_internal(NewResourceData)),
+  ok = core_riak:save(RiakPid, RiakObj),
+  {resource, NewResourceData}.
+
+%  case proplists:get_value(key, ResourceData, undefined) of
+update(RiakPid, ResourceName, ResourceKey, Resource={resource, ResourceData}) ->
+  {ok, RiakObj} = core_riak:fetch(RiakPid, ResourceName, ResourceKey),
+  io:format("[debug] resource data: ~p json: ~p~n", 
+    [ ResourceData, to_json_internal(ResourceData) ]),
+  NewRiakObj = core_riak:update(RiakObj, to_json_internal(ResourceData)),
+  io:format("[debug] new riak obj ~p~n", [NewRiakObj]),
+  ok = core_riak:save(RiakPid, NewRiakObj),
+  {resource, ResourceData}.
+
+delete(RiakPid, ResourceName, ResourceKey) when is_list(ResourceKey) ->
+  core_riak:delete(RiakPid, ResourceName, list_to_binary(ResourceKey));
+delete(RiakPid, ResourceName, ResourceKey) when is_binary(ResourceKey) ->
+  core_riak:delete(RiakPid, ResourceName, ResourceKey).
 
 %%
 %% helpers used internally

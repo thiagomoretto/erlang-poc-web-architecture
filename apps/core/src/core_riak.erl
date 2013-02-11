@@ -1,5 +1,5 @@
 -module(core_riak).
--export([connect/1,create/3,create/4,fetch/3,update/2,get_value/1,save/2,new_key/0,new_key/1]).
+-export([connect/1,create/3,create/4,fetch/3,update/2,get_value/1,save/2,new_key/0,new_key/1,delete/3]).
 
 %% @spec connect(connection_info()) -> pid()
 %% @doc Create a connection to the specified Riak cluster and
@@ -53,6 +53,12 @@ get_value(RiakObj) ->
 %% @doc Saves the given riak object to the specified Riak node/cluster.
 save(RiakPid, RiakObj) ->
   Result = riakc_pb_socket:put(RiakPid, RiakObj),
+  Result.
+
+%% @spec delete(pid(), binary, binary) -> ok | {error | Reason}
+%% @doc Deletes riak object based on given key to the specified Riak node/cluster.
+delete(RiakPid, Bucket, Key) ->
+  Result = riakc_pb_socket:delete(RiakPid, Bucket, Key),
   Result.
 
 %% @spec new_key() -> key()

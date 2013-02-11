@@ -6,7 +6,7 @@
 %% API Function Exports
 %% ------------------------------------------------------------------
 
--export([start_link/0, get_resource/2, save_resource/3]).
+-export([start_link/0, get_resource/2, save_resource/2, update_resource/3,delete_resource/2]).
 
 %% ------------------------------------------------------------------
 %% gen_server Function Exports
@@ -28,9 +28,19 @@ get_resource(ResourcePath, ResourceKey) ->
   gen_server:call(?SERVER, {get_resource, ResourcePath, ResourceKey}, infinity).
 
 %% 
-%% OTP API function to save a resource based on the key.
-save_resource(ResourcePath, ResourceKey, ResourceData) ->
-  gen_server:call(?SERVER, {save_resource, ResourcePath, ResourceKey, ResourceData}, infinity).
+%% OTP API function to get a resource based on the key.
+delete_resource(ResourcePath, ResourceKey) ->
+  gen_server:call(?SERVER, {delete_resource, ResourcePath, ResourceKey}, infinity).
+
+%% 
+%% OTP API function to save a new resource.
+save_resource(ResourcePath, ResourceData) ->
+  gen_server:call(?SERVER, {save_resource, ResourcePath, ResourceData}, infinity).
+
+%% 
+%% OTP API function to update a resource based on the key.
+update_resource(ResourcePath, ResourceKey, ResourceData) ->
+  gen_server:call(?SERVER, {update_resource, ResourcePath, ResourceKey, ResourceData}, infinity).
 
 %% ------------------------------------------------------------------
 %% gen_server Function Definitions
@@ -47,10 +57,22 @@ handle_call({get_resource, ResourcePath, ResourceKey}, _From, State) ->
       core_data:fetch_as_json(RiakPid, ResourcePath, ResourceKey) end),
   {reply, ResourceJson, State};
 
-handle_call({save_resource, ResourcePath, ResourceKey, ResourceData}, _From, State) ->
+handle_call({delete_resource, ResourcePath, ResourceKey}, _From, State) ->
+  ResourceJson = pooler:use_member(
+    fun(RiakPid) ->
+      core_data:delete(RiakPid, ResourcePath, ResourceKey) end),
+  {reply, ResourceJson, State};
+
+handle_call({save_resource, ResourcePath, ResourceData}, _From, State) ->
   SavedResource = pooler:use_member(
     fun(RiakPid) ->
-      core_data:save(RiakPid, ResourcePath, ResourceKey, ResourceData) end),
+      core_data:save(RiakPid, ResourcePath, ResourceData) end),
+  {reply, SavedResource, State};
+
+handle_call({update_resource, ResourcePath, ResourceKey, ResourceData}, _From, State) ->
+  SavedResource = pooler:use_member(
+    fun(RiakPid) ->
+      core_data:update(RiakPid, ResourcePath, ResourceKey, ResourceData) end),
   {reply, SavedResource, State};
 
 handle_call(_Request, _From, State) ->

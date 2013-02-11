@@ -1,4 +1,5 @@
 ERL?=erl
+PYTHON=/usr/local/Cellar/python/2.7.3/bin/python
 
 .PHONY: deps
 
@@ -39,3 +40,6 @@ corestart: app
 
 proxystart:
 	@haproxy -f dev.haproxy.conf
+
+api-tests:
+	$(shell $(PYTHON) -m unittest discover test '*_tests.py' -v)

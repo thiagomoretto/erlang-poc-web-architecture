@@ -19,10 +19,14 @@ from_json(Json, IsStrFun) ->
 %%
 from_proplist(List=[H|_], IsStrFun) when is_tuple(H) ->
   { struct, lists:map(fun(P) -> from_proplist(P, IsStrFun) end, List) };
-from_proplist({PropName, ComplexProp=[H|_]}, IsStrFun) when is_tuple(H) ->
+from_proplist({PropName, ComplexProp=[H|_]}, IsStrFun) when is_tuple(H), is_atom(PropName) ->
   { list_to_binary(atom_to_list(PropName)), from_proplist(ComplexProp, IsStrFun) };
-from_proplist({PropName, PropVal}, IsStrFun) ->
-  { list_to_binary(atom_to_list(PropName)), to_value(PropName, PropVal, IsStrFun) }.
+from_proplist({PropName, PropVal}, IsStrFun) when is_atom(PropName) ->
+  { list_to_binary(atom_to_list(PropName)), to_value(PropName, PropVal, IsStrFun) };
+from_proplist({PropName, ComplexProp=[H|_]}, IsStrFun) when is_tuple(H), is_list(PropName) ->
+  { list_to_binary(PropName), from_proplist(ComplexProp, IsStrFun) };
+from_proplist({PropName, PropVal}, IsStrFun) when is_list(PropName) ->
+  { list_to_binary(PropName), to_value(PropName, PropVal, IsStrFun) }.
 
 to_proplist({struct, PropList}, IsStrFun) when is_list(PropList) ->
   lists:map(fun(P) -> to_proplist(P, IsStrFun) end, PropList);

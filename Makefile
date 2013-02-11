@@ -19,6 +19,7 @@ distclean: clean
 
 webstart: app
 	exec erl \
+		-pa $(PWD)/apps/app/ebin \
 		-pa $(PWD)/apps/shared/ebin \
 		-pa $(PWD)/apps/frontend/ebin \
 		-pa $(PWD)/deps/*/ebin \
@@ -28,6 +29,7 @@ webstart: app
 
 corestart: app
 	exec erl \
+		-pa $(PWD)/apps/app/ebin \
 		-pa $(PWD)/apps/shared/ebin \
 		-pa $(PWD)/apps/core/ebin \
 		-pa $(PWD)/deps/*/ebin \

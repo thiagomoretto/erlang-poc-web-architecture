@@ -1,0 +1,7 @@
+{% extends 'base.dtl' %}
+
+{% block page_title %}Page title{% endblock %}
+
+{% block body_content %}
+    <h1>Welcome!</h1>
+{% endblock %}

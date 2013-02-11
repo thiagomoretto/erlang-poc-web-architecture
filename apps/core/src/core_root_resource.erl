@@ -10,11 +10,22 @@ content_types_provided(ReqData, State) ->
   {[{"application/json", to_json}], ReqData, State}.
 
 resource_exists(ReqData, State) -> 
-  {true, ReqData, State}.
-
-to_json(ReqData, State) ->
   PathInfo = wrq:path_info(ReqData),
   {ok, ResourceName} = dict:find(resource, PathInfo),
   {ok, ResourceKey} = dict:find(key, PathInfo),
-  {resource, ResourceJson} = core_server:get_resource(ResourceName, ResourceKey),
-  {ResourceJson, ReqData, State}.
+  case erlang:apply(list_to_atom(string:concat(ResourceName, "_resource")), get, [ResourceKey]) of
+    {resource, Resource} ->
+      {true, ReqData, {resource, Resource}};
+    {error, notfound} ->
+      io:format("Not found ~p@~p~n", [ResourceKey, ResourceName]),
+      {false, ReqData, State};
+    _ ->
+      io:format("Unknown error at ~p@~p~n", [ResourceKey, ResourceName]),
+      {false, ReqData, State}
+  end.
+
+to_json(ReqData, State={resource, Resource}) ->
+  {Resource, ReqData, State};
+
+to_json(ReqData, State) ->
+  {<<"error">>, ReqData, State}.

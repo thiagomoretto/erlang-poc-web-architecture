@@ -6,7 +6,7 @@
 %% API Function Exports
 %% ------------------------------------------------------------------
 
--export([start_link/0, get_resource/2]).
+-export([start_link/0, get_resource/2, save_resource/3]).
 
 %% ------------------------------------------------------------------
 %% gen_server Function Exports
@@ -27,6 +27,11 @@ start_link() ->
 get_resource(ResourcePath, ResourceKey) ->
   gen_server:call(?SERVER, {get_resource, ResourcePath, ResourceKey}, infinity).
 
+%% 
+%% OTP API function to save a resource based on the key.
+save_resource(ResourcePath, ResourceKey, ResourceData) ->
+  gen_server:call(?SERVER, {save_resource, ResourcePath, ResourceKey, ResourceData}, infinity).
+
 %% ------------------------------------------------------------------
 %% gen_server Function Definitions
 %% ------------------------------------------------------------------
@@ -41,6 +46,12 @@ handle_call({get_resource, ResourcePath, ResourceKey}, _From, State) ->
     fun(RiakPid) ->
       core_data:fetch_as_json(RiakPid, ResourcePath, ResourceKey) end),
   {reply, ResourceJson, State};
+
+handle_call({save_resource, ResourcePath, ResourceKey, ResourceData}, _From, State) ->
+  SavedResource = pooler:use_member(
+    fun(RiakPid) ->
+      core_data:save(RiakPid, ResourcePath, ResourceKey, ResourceData) end),
+  {reply, SavedResource, State};
 
 handle_call(_Request, _From, State) ->
     {reply, ok, State}.

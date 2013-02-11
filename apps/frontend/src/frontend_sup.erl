@@ -1,10 +1,7 @@
-%% @author author <author@example.com>
-%% @copyright YYYY author.
-
 %% @doc Supervisor for the frontend application.
 
 -module(frontend_sup).
--author('author <author@example.com>').
+-author('Thiago Moretto <thiago@moretto.eng.br>').
 
 -behaviour(supervisor).
 
@@ -13,6 +10,9 @@
 
 %% supervisor callbacks
 -export([init/1]).
+
+%% Helper macro for declaring children of supervisor
+-define(CHILD(I, Type), {I, {I, start_link, []}, permanent, 5000, Type, [I]}).
 
 %% @spec start_link() -> ServerRet
 %% @doc API for starting the supervisor.
@@ -45,7 +45,10 @@ init([]) ->
   Web = {webmachine_mochiweb,
     {webmachine_mochiweb, start, [WebConfig]},
     permanent, 5000, worker, dynamic},
-  Processes = [Web],
+
+  Consumer = ?CHILD(frontend_consumer, worker),
+
+  Processes = [Web, Consumer],
   {ok, { {one_for_one, 10, 10}, Processes} }.
 
 %%

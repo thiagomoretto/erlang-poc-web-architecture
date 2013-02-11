@@ -13,4 +13,4 @@ resource_exists(ReqData, State) ->
   {true, ReqData, State}.
 
 to_json(ReqData, State) ->
-  {mochijson:encode(<<"OK">>), ReqData, State}.
+  {mochijson:encode({struct, [{name, "foobar"}]}), ReqData, State}.

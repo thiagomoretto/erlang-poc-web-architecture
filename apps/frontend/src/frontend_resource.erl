@@ -35,7 +35,7 @@ render_resource(ReqData, State, Template, ResourcePath, _) ->
 %% 
 %% Internal utility functions
 from_json_internal(Json) ->
-  frontend_json:from_json(Json, fun is_string/1).
+  common_json:from_json(Json, fun is_string/1).
 
 is_string(_) -> 
   true.

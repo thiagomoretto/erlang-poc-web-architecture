@@ -13,4 +13,8 @@ resource_exists(ReqData, State) ->
   {true, ReqData, State}.
 
 to_json(ReqData, State) ->
-  {mochijson:encode({struct, [{name, "foobar"}]}), ReqData, State}.
+  PathInfo = wrq:path_info(ReqData),
+  {ok, ResourceName} = dict:find(resource, PathInfo),
+  {ok, ResourceKey} = dict:find(key, PathInfo),
+  {resource, ResourceJson} = core_server:get_resource(ResourceName, ResourceKey),
+  {ResourceJson, ReqData, State}.

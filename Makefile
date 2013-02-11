@@ -18,12 +18,20 @@ distclean: clean
 	@./rebar delete-deps
 
 webstart: app
-	exec erl -pa $(PWD)/apps/*/ebin -pa $(PWD)/deps/*/ebin -boot start_sasl \
+	exec erl \
+		-pa $(PWD)/apps/shared/ebin \
+		-pa $(PWD)/apps/frontend/ebin \
+		-pa $(PWD)/deps/*/ebin \
+		-boot start_sasl \
 		-config $(PWD)/apps/frontend/priv/app.config \
 		-s reloader -s frontend
 
 corestart: app
-	exec erl -pa $(PWD)/apps/*/ebin -pa $(PWD)/deps/*/ebin -boot start_sasl \
+	exec erl \
+		-pa $(PWD)/apps/shared/ebin \
+		-pa $(PWD)/apps/core/ebin \
+		-pa $(PWD)/deps/*/ebin \
+		-boot start_sasl \
 		-config $(PWD)/apps/core/priv/app.config \
 		-s reloader -s core
 

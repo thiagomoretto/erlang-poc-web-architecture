@@ -6,7 +6,7 @@
 %% API Function Exports
 %% ------------------------------------------------------------------
 
--export([start_link/0]).
+-export([start_link/0, get_resource/2]).
 
 %% ------------------------------------------------------------------
 %% gen_server Function Exports
@@ -22,12 +22,25 @@
 start_link() ->
     gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
+%% 
+%% OTP API function to get a resource based on the key.
+get_resource(ResourcePath, ResourceKey) ->
+  gen_server:call(?SERVER, {get_resource, ResourcePath, ResourceKey}, infinity).
+
 %% ------------------------------------------------------------------
 %% gen_server Function Definitions
 %% ------------------------------------------------------------------
 
 init(Args) ->
     {ok, Args}.
+
+%%
+%% Handling "get_resource" event from API
+handle_call({get_resource, ResourcePath, ResourceKey}, _From, State) ->
+  ResourceJson = pooler:use_member(
+    fun(RiakPid) ->
+      core_data:fetch_as_json(RiakPid, ResourcePath, ResourceKey) end),
+  {reply, ResourceJson, State};
 
 handle_call(_Request, _From, State) ->
     {reply, ok, State}.

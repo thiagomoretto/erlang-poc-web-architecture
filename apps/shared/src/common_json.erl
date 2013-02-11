@@ -1,4 +1,4 @@
--module(frontend_json).
+-module(common_json).
 -export([from_json/1,from_json/2,to_json/1,to_json/2]).
 
 %% API

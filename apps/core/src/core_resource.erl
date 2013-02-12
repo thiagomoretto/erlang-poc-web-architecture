@@ -1,7 +1,7 @@
 -module(core_resource).
 -export([init/1, allowed_methods/2, post_is_create/2, create_path/2, allow_missing_post/2,
          delete_resource/2, content_types_provided/2, content_types_accepted/2,
-         resource_exists/2, to_json/2, from_json/2, process_form/2]).
+         resource_exists/2, to_json/2, from_json/2, process_form/2, generate_etag/2]).
 
 -include_lib("webmachine/include/webmachine.hrl").
 
@@ -106,9 +106,15 @@ process_form('PUT', ReqData, State) ->
 process_form(_, ReqData, State) ->
   {false, ReqData, State}.
 
-%%
 from_json(ReqData, State) ->
   {false, ReqData, State}.
+
+generate_etag(ReqData, State) ->
+  {resource, Data} = State,
+  {mochihex:to_hex(crypto:md5(Data)), ReqData, State}.
+
+% encodings_provided(ReqData, State) ->
+%   {[{"gzip", fun(X) -> zlib:gzip(X) end}], ReqData, State}.
 
 %% Handle calls to "core_data" implementation
 %%

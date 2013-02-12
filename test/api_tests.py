@@ -8,6 +8,7 @@ import json
 class TestAPI(unittest.TestCase):
  
   def setUp(self):
+    self.resource = "posts"
     self.base_url = "http://localhost:8001"
     self.json_headers ={"Content-Type" : "application/json", "Accept" : "application/json"}
     self.form_headers ={"Content-Type" : "application/x-www-form-urlencoded", "Accept" : "application/json"}
@@ -17,8 +18,8 @@ class TestAPI(unittest.TestCase):
     self.assertEqual(resp.content, "OK")
  
   def test_new_resource_and_get_it(self):
-    url = self.base_url + "/api/product"
-    resp = requests.post(url, data={"name":"TV 62 LCD"}, headers=self.form_headers)
+    url = self.base_url + "/api/" + self.resource
+    resp = requests.post(url, data={"title":"Something"}, headers=self.form_headers)
     self.assertEqual(resp.status_code, 201)
 
     key = json.loads(resp.content)['key']
@@ -28,23 +29,23 @@ class TestAPI(unittest.TestCase):
   
   def test_update_existing_resource_with_put(self):
     # create
-    url = self.base_url + "/api/product"
-    resp = requests.post(url, data={"name":"TV 62 LCD"}, headers=self.form_headers)
+    url = self.base_url + "/api/" + self.resource
+    resp = requests.post(url, data={"title":"Anything"}, headers=self.form_headers)
     self.assertEqual(resp.status_code, 201)
     key = json.loads(resp.content)['key']
-    
+    print key
     # update
-    url = self.base_url + "/api/product/" + key
-    resp = requests.put(url, data={"name":"TV 50 LCD"}, headers=self.form_headers)
+    url = self.base_url + "/api/" + self.resource + "/" + key
+    resp = requests.put(url, data={"title":"Anothertitle","text":"Foobar"}, headers=self.form_headers)
     self.assertEqual(resp.status_code, 200)
 
     resp2 = requests.get(url)
     self.assertEqual(resp2.status_code, 200)
-    self.assertEqual(resp2.content, '{"key":"'+key+'","name":"TV 50 LCD"}')
+    self.assertEqual(resp2.content, '{"key":"'+key+'","text":"Foobar","title":"Anothertitle"}')
 
   def test_delete_resource(self):
-    url = self.base_url + "/api/product"
-    resp = requests.post(url, data={"name":"TV 62 LCD"}, headers=self.form_headers)
+    url = self.base_url + "/api/" + self.resource
+    resp = requests.post(url, data={"title":"Something"}, headers=self.form_headers)
     self.assertEqual(resp.status_code, 201)
     key = json.loads(resp.content)['key']
 

@@ -54,7 +54,7 @@ init(Args) ->
 handle_call({get_resource, ResourcePath, ResourceKey}, _From, State) ->
   ResourceJson = pooler:use_member(
     fun(RiakPid) ->
-      core_data:fetch_as_json(RiakPid, ResourcePath, ResourceKey) end),
+      core_data:fetch(RiakPid, ResourcePath, ResourceKey) end),
   {reply, ResourceJson, State};
 
 handle_call({delete_resource, ResourcePath, ResourceKey}, _From, State) ->

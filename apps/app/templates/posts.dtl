@@ -1,0 +1,19 @@
+{% extends 'base.dtl' %}
+{% block page_title %}Post {{ posts.title }}{% endblock %}
+{% block body_content %}
+<div>
+    <h1>{{ posts.title }}</h1>
+
+    <pre>
+      {{ posts.text }}
+    </pre>
+</div>
+
+<div>
+  <form action="http://localhost:8001/api/posts" method="post">
+    <input type="text" name="title" />
+    <textarea name="text"></textarea>
+    <input type="submit"/>
+  </form>
+</div>
+{% endblock %}

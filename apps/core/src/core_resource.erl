@@ -33,10 +33,8 @@ resource_exists('GET', ReqData, State) ->
     {resource, Resource} ->
       {true, ReqData, {resource, Resource}};
     {error, notfound} ->
-      io:format("Not found ~p@~p~n", [ResourceKey, ResourceName]),
       {false, ReqData, State};
     _ ->
-      io:format("Unknown error at ~p@~p~n", [ResourceKey, ResourceName]),
       {false, ReqData, State}
   end;
 
@@ -79,8 +77,6 @@ process_form('POST', ReqData, State) ->
   ResourceProps = mochiweb_util:parse_qs(wrq:req_body(ReqData)),
   case save_new(ResourceName, ResourceProps) of
     {resource, NewResourceData} ->
-      %NewKey = proplists:get_value(key, NewResourceData, undefined),
-      %R = wrq:set_resp_header("Location", NewKey, ReqData),
       NewReqData = wrq:set_resp_header("Content-type", "application/json", 
                    wrq:set_resp_body(common_json:to_json(NewResourceData), ReqData)),
       {true, NewReqData, State};
@@ -95,7 +91,6 @@ process_form('PUT', ReqData, State) ->
   ResourceData  = [{key, ResourceKey} | ResourceProps],
   case update_by_key(ResourceName, ResourceKey, ResourceData) of
     {resource, NewResourceData} ->
-      %R = wrq:set_resp_header("Location", ResourceKey, ReqData),
       NewReqData = wrq:set_resp_header("Content-type", "application/json", 
                    wrq:set_resp_body(common_json:to_json(NewResourceData), ReqData)),
       {true, NewReqData, State};
@@ -119,16 +114,13 @@ generate_etag(ReqData, State) ->
 %% Handle calls to "core_data" implementation
 %%
 get_by_key(ResourceName, ResourceKey) ->
-  erlang:apply(list_to_atom(string:concat(ResourceName, "_resource")), get, [ResourceKey]).
+  resource_caller:call(ResourceName, get, [ResourceKey]).
 
 delete_by_key(ResourceName, ResourceKey) ->
-  erlang:apply(list_to_atom(string:concat(ResourceName, "_resource")), delete, [ResourceKey]).
+  resource_caller:call(ResourceName, delete, [ResourceKey]).
 
-% ResourceData -> proplists
 update_by_key(ResourceName, ResourceKey, ResourceData) ->
-  erlang:apply(list_to_atom(string:concat(ResourceName, "_resource")), update, 
-      [ResourceKey, {resource, ResourceData}]).
-
+  resource_caller:call(ResourceName, update, [ResourceKey, {resource, ResourceData}]).
+  
 save_new(ResourceName, ResourceData) ->
-  erlang:apply(list_to_atom(string:concat(ResourceName, "_resource")), save, 
-      [{resource, ResourceData}]).
+  resource_caller:call(ResourceName, save, [{resource, ResourceData}]).

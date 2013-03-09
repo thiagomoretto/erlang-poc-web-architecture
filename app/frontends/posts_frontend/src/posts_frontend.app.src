@@ -1,0 +1,16 @@
+%%-*- mode: erlang -*-
+{application, posts_frontend,
+ [
+  {description, "posts_frontend"},
+  {vsn, "1"},
+  {modules, []},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib,
+                  inets,
+                  crypto,
+                  erlydtl
+                 ]},
+  {env, []}
+ ]}.

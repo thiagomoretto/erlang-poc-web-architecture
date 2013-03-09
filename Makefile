@@ -20,22 +20,22 @@ distclean: clean
 
 webstart: app
 	exec erl \
-		-pa $(PWD)/apps/app/ebin \
-		-pa $(PWD)/apps/shared/ebin \
-		-pa $(PWD)/apps/frontend/ebin \
+		-pa $(PWD)/core/shared/ebin \
+		-pa $(PWD)/core/base_frontend/ebin \
+		-pa $(PWD)/app/frontends/posts_frontend/ebin \
 		-pa $(PWD)/deps/*/ebin \
 		-boot start_sasl \
-		-config $(PWD)/apps/frontend/priv/app.config \
+		-config $(PWD)/core/base_frontend/priv/app.config \
 		-s reloader -s frontend
 
-corestart: app
+services-start: app
 	exec erl \
-		-pa $(PWD)/apps/app/ebin \
-		-pa $(PWD)/apps/shared/ebin \
-		-pa $(PWD)/apps/core/ebin \
+		-pa $(PWD)/core/shared/ebin \
+		-pa $(PWD)/core/base_service/ebin \
+		-pa $(PWD)/app/services/posts_service/ebin \
 		-pa $(PWD)/deps/*/ebin \
 		-boot start_sasl \
-		-config $(PWD)/apps/core/priv/app.config \
+		-config $(PWD)/core/base_service/priv/app.config \
 		-s reloader -s core
 
 proxystart:

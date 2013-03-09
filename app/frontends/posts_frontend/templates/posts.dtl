@@ -1,6 +1,9 @@
 {% extends 'base.dtl' %}
 {% block page_title %}Post {{ posts.title }}{% endblock %}
 {% block body_content %}
+
+HI!!
+
 <div>
     <h1>{{ posts.title }}</h1>
 
